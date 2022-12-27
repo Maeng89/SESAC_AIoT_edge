@@ -133,12 +133,12 @@ def avg_sensor(sensors):
           'growth_level' : 0,
           'update_time' : 0}
     for s in sensors:
-        sd['water_level'] += s[0]
-        sd['ph'] += s[1]
-        sd['turbidity'] += s[2]
-        sd['temp'] += s[3]
-        sd['humidity'] += s[4]
-        q.append(s[5])
+        sd['water_level'] += s[1]
+        sd['ph'] += s[2]
+        sd['turbidity'] += s[3]
+        sd['temp'] += s[4]
+        sd['humidity'] += s[5]
+        q.append(s[6])
 
     if sd['water_level'] >= s_len / 2:
         sd['water_level'] = 1
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     import socket, errno
     
 
-    HOST='192.168.12.4'
+    HOST='192.168.12.3'
     PORT=7477
     print('server connect start')
     client_socket=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -186,22 +186,19 @@ if __name__ == '__main__':
         try:
             client_socket.connect((HOST,7477))
             print('sever response waiting', num)
-            sleep(0.5)
+            sleep(1)
         except socket.error as e:
-            if e.errno == errno.ECONNREFUSED :
+            if e.errno == errno.ECONNREFUSED : # 111, fail retry
                 print(e, num)
-                sleep(0.5)
+                sleep(1)
                 continue
-            elif e.errno == errno.EADDRINUSE :
-                print(e)
-                socket.reset()
-                print('socket reset', num)
-                sleep(0.5)
-                continue
-            else Exception as e:
-                print('connection error', num)
-                print(e)
-                sleep(0.5)
+            elif e.errno == errno.EISCONN : # 106, success
+                print(e, num)
+                break
+            else  : # error stop
+                print('connection error')
+                print(e, num)
+                sleep(1)
                 break
         
         
@@ -223,6 +220,7 @@ if __name__ == '__main__':
                 print('empty growthLevel data')
                 print('connect termination')
                 break
+            
             else :
                 #print(data.decode('utf-8'))
                 client_socket.sendall('receive'.encode()) #recieve response
