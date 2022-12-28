@@ -1,5 +1,12 @@
 .ipynb_checkpoints
-*/.ipynb_checkpoints/*
-*/nugunaaiot-maeng-1004a11a5af7.json/*
-*.pyc
 __pycache__/
+.pyc
+data/
+key/
+secret/
+
+
+
+
+
+
