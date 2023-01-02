@@ -16,7 +16,7 @@ from firebase_admin import firestore
 from datetime import datetime
 
 # Cloud Database : Firebase
-cred = credentials.Certificate('./nugunaaiot-maeng-1004a11a5af7.json')
+cred = credentials.Certificate('../../secret/firebase_key/nugunaaiot-maeng-1004a11a5af7.json')
 app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -133,12 +133,13 @@ def avg_sensor(sensors):
           'growth_level' : 0,
           'update_time' : 0}
     for s in sensors:
+        q.append(int(s[0]))
         sd['water_level'] += s[1]
         sd['ph'] += s[2]
         sd['turbidity'] += s[3]
         sd['temp'] += s[4]
         sd['humidity'] += s[5]
-        q.append(s[6])
+
 
     if sd['water_level'] >= s_len / 2:
         sd['water_level'] = 1
@@ -146,7 +147,7 @@ def avg_sensor(sensors):
         sd['water_level'] = 0
     
     sd['growth_level'] = str(round(sum(q)/qsize))
-    print(growth_level)
+
     sd['ph'] = round(sd['ph'] / s_len , 1)
     sd['turbidity'] = round(sd['turbidity'] / s_len, 1)
     sd['temp'] = round(sd['temp'] / s_len, 1)
@@ -176,7 +177,7 @@ if __name__ == '__main__':
     import socket, errno
     
 
-    HOST='192.168.12.3'
+    HOST='192.168.50.133' # jetson nano
     PORT=7477
     print('server connect start')
     client_socket=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -234,6 +235,7 @@ if __name__ == '__main__':
                      
                 print('update_time = {}, growthLevel= {}, waterLevel ={}, ph = {}, turbidity= {}, temp = {}, humidity = {}'.format(upt, gl, wl, ph, tb, tp, hd))
                 sensors.append([gl, wl, ph, tb, tp, hd, upt])
+
               
     #             if tp == None:
     #                 pass
