@@ -16,7 +16,7 @@ def gstreamer_pipeline(
     capture_height=1080,
     display_width=800,
     display_height=480,
-    framerate= 1,
+    framerate= 1.0,
     flip_method=0,
 ):
     return (
@@ -50,9 +50,9 @@ def show():
                 num += 1
                 ret_val, frame = video_capture.read()
                 if frame is None:
-                    print('empty frame pass', num)
+                    print('empty frame, check the camera', num)
                     sleep(1)
-                    pass
+                
                 else:
                     if cv2.getWindowProperty(window_title, cv2.WND_PROP_AUTOSIZE) >= 0:
                         cv2.imshow(window_title, frame)
@@ -61,6 +61,7 @@ def show():
                             img = frame[0:460, 80:560]
                             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                             img = cv2.resize(img, (150,150)) / 255.0 # inputµ¥ÀÌÅÍ¸¦ ½ºÄÉÀÏ¸µÇß±â ¶§¹®¿¡ ¿¹ÃøÇÒ ¶§¿¡µµ ½ºÄÉÀÏ¸µ ÇØ¾ßÇÔ
+                            
                             pred = loaded([img])
                             pred = np.asarray(pred)
                             growth_level = str(np.argmax(pred, axis=1)[0])
@@ -77,32 +78,45 @@ def show():
                             sleep(1.5)
                         except Exception as e:
                             print(e)
-                            pass
+                            break
+                    else:
+                        print('????')
 # while loop finish line
                 keyCode = cv2.waitKey(10) & 0xFF
                 if keyCode == 27 or keyCode == ord('q'):
                     video_capture.release()
                     cv2.destroyAllWindows()
+                    client_socket.close()
+                    server_socket.close()
                     sleep(2)
                     break
         finally:
             video_capture.release()
             cv2.destroyAllWindows()
+            client_socket.close()
+            server_socket.close()
             sleep(2)
-
     else:
         print("Error: Unable to open camera")
 
 
 if __name__ == "__main__":
     # server
-    import socket
+    import socket, errno
     HOST = ''
     PORT = 7477
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-    server_socket.bind(('', 7477))
+    
+    try :
+        print('socket binding start')
+        server_socket.bind(('', 7477))
+    except socket.err as e:
+        if e.errno == errno.EADDRINUSE: # 98 8address already in use
+            print(e)
+        else :
+            print(e)
+    
     server_socket.listen()
     client_socket, addr = server_socket.accept()
     print('Connected by', addr)
