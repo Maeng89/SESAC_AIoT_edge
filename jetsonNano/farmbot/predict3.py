@@ -37,13 +37,6 @@ def gstreamer_pipeline(
         )
     )
 
-def process_close() :
-    
-
-    print('process close')
-    
-
-
 def show():
     num = 0
     window_title = 'aiot'
@@ -108,7 +101,7 @@ def show():
 
 if __name__ == "__main__":
     # option
-    interval = 5
+    interval = 2 # sec
     
     # server
     import socket, errno
