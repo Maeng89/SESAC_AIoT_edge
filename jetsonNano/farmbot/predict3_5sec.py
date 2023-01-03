@@ -38,16 +38,14 @@ def gstreamer_pipeline(
     )
 
 def process_close() :
-    video_capture.release()
-    cv2.destroyAllWindows()
-    client_socket.close()
-    server_socket.close()
-    sleep(2)
+    
+
     print('process close')
     
 
-num = 0
+
 def show():
+    num = 0
     window_title = 'aiot'
     video_capture = cv2.VideoCapture(gstreamer_pipeline(), cv2.CAP_GSTREAMER)
     if video_capture.isOpened():
@@ -92,10 +90,18 @@ def show():
 # while loop finish line
                 keyCode = cv2.waitKey(10) & 0xFF
                 if keyCode == 27 or keyCode == ord('q'):
-                    process_close()
+                    video_capture.release()
+                    cv2.destroyAllWindows()
+                    client_socket.close()
+                    server_socket.close()
+                    sleep(2)
                     break
         finally:
-            process_close()
+            video_capture.release()
+            cv2.destroyAllWindows()
+            client_socket.close()
+            server_socket.close()
+            sleep(2)
     else:
         print("Error: Unable to open camera")
 
