@@ -15,8 +15,13 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from datetime import datetime
 
+# option
+db_collection = 'converea' # database collection id
+db_id = '0.1v' # database document id
+db_key = 'nugunaaiot-maeng-1004a11a5af7.json'
+
 # Cloud Database : firestore
-cred = credentials.Certificate('../../secret/firebase_key/{}'.format(key))
+cred = credentials.Certificate(f'../../secret/firebase_key/{db_key}')
 app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -176,11 +181,7 @@ def fan(tp):
 if __name__ == '__main__':
     
     # option
-    db_collection = 'converea' # database collection id
-    db_id = '0.1v' # database document id
-    db_key = 'nugunaaiot-maeng-1004a11a5af7.json'
-    
-    
+
     interval = 5 # 5 sec
     
     
