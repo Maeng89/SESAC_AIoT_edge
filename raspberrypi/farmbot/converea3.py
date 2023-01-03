@@ -80,10 +80,8 @@ def temp_read():
 
 def water_level_read_digital():
     water_level = GPIO.input(WL)
-    if (water_level == 0):
-        return 1
-    elif (water_level == 1):
-        return 0
+    if water_level :
+        return water_level
     else:
         raise Exception()
 
@@ -182,7 +180,7 @@ if __name__ == '__main__':
     
     # option
 
-    interval = 5 # 5 sec
+    interval = 2 # sec
     
     
     
