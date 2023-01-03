@@ -16,7 +16,7 @@ def gstreamer_pipeline(
     capture_height=1080,
     display_width=800,
     display_height=480,
-    framerate= 1.0,
+    framerate= 30,
     flip_method=0,
 ):
     return (
@@ -37,9 +37,17 @@ def gstreamer_pipeline(
         )
     )
 
+def process_close() :
+    video_capture.release()
+    cv2.destroyAllWindows()
+    client_socket.close()
+    server_socket.close()
+    sleep(2)
+    print('process close')
+    
+
 num = 0
 def show():
-    num = 0;
     window_title = 'aiot'
     video_capture = cv2.VideoCapture(gstreamer_pipeline(), cv2.CAP_GSTREAMER)
     if video_capture.isOpened():
@@ -49,10 +57,10 @@ def show():
             while True:
                 num += 1
                 ret_val, frame = video_capture.read()
-                if frame is None:
-                    print('empty frame, check the camera', num)
-                    sleep(1)
                 
+                if frame is None:
+                    print('empty frame, reboot please', num)
+                    sleep(1)
                 else:
                     if cv2.getWindowProperty(window_title, cv2.WND_PROP_AUTOSIZE) >= 0:
                         cv2.imshow(window_title, frame)
@@ -65,17 +73,17 @@ def show():
                             pred = loaded([img])
                             pred = np.asarray(pred)
                             growth_level = str(np.argmax(pred, axis=1)[0])
-                            num+=1
+                        
                             print(num, ' growth level', growth_level)
                             
                             client_socket.sendall(growth_level.encode())
-                            sleep(0.5)
+                            #sleep(0.5)
                             client_response = client_socket.recv(1024).decode()
                             if not client_response:
                                 print('client no response')
                                 print('server termination')
                                 break
-                            sleep(1.5)
+                            sleep(interval)
                         except Exception as e:
                             print(e)
                             break
@@ -84,23 +92,18 @@ def show():
 # while loop finish line
                 keyCode = cv2.waitKey(10) & 0xFF
                 if keyCode == 27 or keyCode == ord('q'):
-                    video_capture.release()
-                    cv2.destroyAllWindows()
-                    client_socket.close()
-                    server_socket.close()
-                    sleep(2)
+                    process_close()
                     break
         finally:
-            video_capture.release()
-            cv2.destroyAllWindows()
-            client_socket.close()
-            server_socket.close()
-            sleep(2)
+            process_close()
     else:
         print("Error: Unable to open camera")
 
 
 if __name__ == "__main__":
+    # option
+    interval = 5
+    
     # server
     import socket, errno
     HOST = ''
@@ -128,12 +131,3 @@ if __name__ == "__main__":
                                                   
     client_socket.close()
     server_socket.close()
-
-
-    
-
-
-
-
-
-
