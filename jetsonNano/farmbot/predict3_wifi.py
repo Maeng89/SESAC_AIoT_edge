@@ -12,12 +12,12 @@ loaded = tf.saved_model.load('./model/converea')
 
 def gstreamer_pipeline(
     sensor_id=0,
-    capture_width=1900,
+    capture_width=1920,
     capture_height=1080,
     display_width=800,
     display_height=480,
-    framerate= 30,
-    flip_method=0,
+    framerate= 10,
+    flip_method= 0,
 ):
     return (
         "nvarguscamerasrc sensor-id=%d !"
@@ -67,14 +67,18 @@ def show():
                         
                             print(num, ' growth level', growth_level)
                             
-                            client_socket.sendall(growth_level.encode())
-                            #sleep(0.5)
+                            client_socket.sendall(growth_level.encode('utf-8'))
+                            
+                            sleep(0.5)
+                            
                             client_response = client_socket.recv(1024).decode()
-                            if not client_response:
+                            if client_response != 'receive':
                                 print('client no response')
                                 print('server termination')
                                 break
+                            print('done')
                             sleep(interval)
+                            
                         except Exception as e:
                             print(e)
                             break
@@ -123,7 +127,7 @@ if __name__ == "__main__":
     client_socket, addr = server_socket.accept()
     print('Connected by', addr)
     
-    client_socket.sendall('connected'.encode('utf-8'))
+    client_socket.sendall('connected'.encode())
     
     while True :    
         show()
