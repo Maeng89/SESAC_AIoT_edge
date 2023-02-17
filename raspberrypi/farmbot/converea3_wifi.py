@@ -21,7 +21,7 @@ db_id = '0.1v' # database document id
 db_key = 'nugunaaiot-maeng-1004a11a5af7.json'
 
 # Cloud Database : firestore
-cred = credentials.Certificate(f'../../secret/firebase_key/{db_key}')
+cred = credentials.Certificate(f'../../secret/{db_key}')
 app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -80,7 +80,7 @@ def temp_read():
 
 def water_level_read_digital():
     water_level = GPIO.input(WL)
-    if water_level :
+    if water_level in [1,0]:
         return water_level
     else:
         raise Exception()
@@ -188,7 +188,7 @@ if __name__ == '__main__':
     import socket, errno
     
 
-    HOST= '192.168.50.133' # jetson nano
+    HOST= '192.168.50.90' # jetson nano
     PORT= 7477
     print('server connect start')
     client_socket=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -213,8 +213,7 @@ if __name__ == '__main__':
                 sleep(1)
                 break
         
-        
-    server_response = client_socket.recv(1024)
+    server_response = client_socket.recv(1024).decode()
     if server_response == 'connected':
         print(server_response)
     
@@ -227,7 +226,8 @@ if __name__ == '__main__':
     # store to database
     while True:
         try:
-            growthLevel = client_socket.recv(1024).decode()
+            growthLevel = client_socket.recv(1024).decode('utf-8')
+            print(growthLevel)
             if not growthLevel:
                 print('empty growthLevel data')
                 print('connect termination')
@@ -246,7 +246,6 @@ if __name__ == '__main__':
                      
                 print('update_time = {}, growthLevel= {}, waterLevel ={}, ph = {}, turbidity= {}, temp = {}, humidity = {}'.format(upt, gl, wl, ph, tb, tp, hd))
                 sensors.append([gl, wl, ph, tb, tp, hd, upt])
-
               
     #             if tp == None:
     #                 pass
