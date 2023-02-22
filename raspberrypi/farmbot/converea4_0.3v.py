@@ -144,7 +144,7 @@ if __name__ == '__main__':
     from firebase_admin import credentials, firestore
     # option
     db_collection = 'converea' # database collection id
-    db_id = '0.2v' # database document id
+    db_id = '0.3v' # database document id
     db_key = 'nugunaaiot-maeng-1004a11a5af7.json'
     # Cloud Database : firestore
     cred = credentials.Certificate(f'../../secret/{db_key}')
